@@ -1,12 +1,9 @@
 package com.arsinde.libcurrentweather
 
-import com.arsinde.libcurrentweather.data.SearchData
 import com.arsinde.libcurrentweather.net.ApiFactory
 import com.arsinde.libcurrentweather.repo.WeatherRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import java.util.regex.Pattern
 
 class CurrentWeather {
@@ -21,16 +18,18 @@ class CurrentWeather {
         val str = StringBuilder()
         if (location.isNotEmpty()) {
             withContext(Dispatchers.IO) {
-                val data = if (location.isCity()) {
+                if (location.isCity()) {
                     repo.getWeatherByCity(location)
                 } else {
                     repo.getWeatherByLocation(location)
+                }?.apply {
+                    forEach {
+                        val weatherInCity = getWeatherInCity(it.woeid)
+                        str.append(weatherInCity)
+                        str.append("\n............................\n")
+                    }
                 }
-                data?.forEach {
-                    val weatherInCity = getWeatherInCity(it.woeid)
-                    str.append(weatherInCity)
-                    str.append("\n............................\n")
-                }
+
             }
         } else {
             str.append(error)
@@ -40,13 +39,11 @@ class CurrentWeather {
     }
 
     private suspend fun getWeatherInCity(id: Int): String {
-
         val str = StringBuilder()
 
         withContext(Dispatchers.IO) {
-            val data = repo.getWeatherById(id)
-            data?.let {
-                with(it) {
+            repo.getWeatherById(id)?.apply {
+                with(this) {
                     str.append("$title\n")
                     consolidated_weather.forEach { cw ->
                         val date = cw.applicable_date.split("T").first()
@@ -54,7 +51,6 @@ class CurrentWeather {
                     }
                 }
             }
-
         }
         return str.toString()
     }
