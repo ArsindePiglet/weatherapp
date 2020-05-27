@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">WeatherApp</string>
+    <string name="show_weather_dialog">show weather dialog</string>
+    <string name="location">Location:</string>
+    <string name="location_hint">36.96,-122.02 or london</string>
+    <string name="dialog_ok">OK</string>
+</resources>

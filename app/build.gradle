@@ -1,0 +1,49 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        applicationId "com.arsinde.weatherapp"
+        minSdkVersion 26
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    implementation deps.kotlin_stdlib
+    implementation deps.appcompat
+    implementation deps.constraint_layout
+    implementation deps.core_ktx
+    implementation deps.logging_interceptor
+    implementation deps.retrofit2
+    implementation deps.retrofit2_coroutines
+    implementation deps.okhttp3
+    implementation deps.coroutines_android
+    implementation deps.coroutines_core
+    implementation deps.gson
+    implementation deps.gson_converter
+    implementation deps.lifecycle_ext
+    implementation deps.lifecycle_vm_ktx
+    implementation deps.fragment_ktx
+    implementation deps.legacy
+    implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'], exclude: [])
+}
