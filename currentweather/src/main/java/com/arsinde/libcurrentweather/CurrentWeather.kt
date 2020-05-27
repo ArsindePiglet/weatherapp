@@ -14,39 +14,23 @@ class CurrentWeather {
     private val repo: WeatherRepository = WeatherRepository(ApiFactory.weatherApi())
     private val error = "Location is absent!"
 
-    private val parentJob = SupervisorJob()
-    private val coroutineScope = CoroutineScope(parentJob + Dispatchers.Default)
-
     private val cityPattern = Pattern.compile("^[a-zA-Z]*$")
     private fun String.isCity() = cityPattern.matcher(this).matches()
 
     suspend fun getCurrentWeather(location: String): String {
-
         val str = StringBuilder()
         if (location.isNotEmpty()) {
-
-            var list = listOf<SearchData>()
-
-            val job = coroutineScope.async {
-                if (location.isCity()) {
+            withContext(Dispatchers.IO) {
+                val data = if (location.isCity()) {
                     repo.getWeatherByCity(location)
                 } else {
                     repo.getWeatherByLocation(location)
                 }
-            }
-
-            try {
-                job.await()?.let {
-                    list = it
+                data?.forEach {
+                    val weatherInCity = getWeatherInCity(it.woeid)
+                    str.append(weatherInCity)
+                    str.append("\n............................\n")
                 }
-            } catch (ex: Exception) {
-                println(ex.message)
-            }
-
-            list.forEach {
-                val weatherInCity = getWeatherInCity(it.woeid)
-                str.append(weatherInCity)
-                str.append("\n............................\n")
             }
         } else {
             str.append(error)
@@ -58,11 +42,10 @@ class CurrentWeather {
     private suspend fun getWeatherInCity(id: Int): String {
 
         val str = StringBuilder()
-        val job = coroutineScope.async {
-            repo.getWeatherById(id)
-        }
-        try {
-            job.await()?.let {
+
+        withContext(Dispatchers.IO) {
+            val data = repo.getWeatherById(id)
+            data?.let {
                 with(it) {
                     str.append("$title\n")
                     consolidated_weather.forEach { cw ->
@@ -71,8 +54,7 @@ class CurrentWeather {
                     }
                 }
             }
-        } catch (ex: Exception) {
-            println(ex.message)
+
         }
         return str.toString()
     }
