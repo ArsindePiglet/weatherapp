@@ -17,7 +17,6 @@ class MainActivity : AppCompatActivity() {
         val bluetoothFragment = CurrentWeatherFragment.newInstance()
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.mainContainer, bluetoothFragment)
-        transaction.addToBackStack(null)
         transaction.commitAllowingStateLoss()
     }
 }
