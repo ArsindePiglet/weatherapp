@@ -4,4 +4,7 @@
     <string name="location">Location:</string>
     <string name="location_hint">36.96,-122.02 or london</string>
     <string name="dialog_ok">OK</string>
+    <string name="bottom_menu_words">words</string>
+    <string name="bottom_menu_dictionary">dictionary</string>
+    <string name="bottom_menu_settings">settings</string>
 </resources>

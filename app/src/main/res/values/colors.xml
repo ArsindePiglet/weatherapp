@@ -5,4 +5,7 @@
     <color name="colorAccent">#FAD297</color>
     <color name="btnTexColor">#C87803</color>
     <color name="errorTexColor">#C3041A</color>
+
+    <color name="pic_grey">#878787</color>
+    <color name="pic_orange">#FF7F08</color>
 </resources>
