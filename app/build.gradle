@@ -46,4 +46,6 @@ dependencies {
     implementation deps.fragment_ktx
     implementation deps.legacy
     implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'], exclude: [])
+    implementation deps.navigation_fr
+    implementation deps.navigation_ui
 }
