@@ -14,7 +14,7 @@ class TranslateFragment : Fragment() {
         fun newInstance() = TranslateFragment()
     }
 
-    private lateinit var viewModel: TranslateViewModel
+//    private lateinit var viewModel: TranslateViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -23,10 +23,10 @@ class TranslateFragment : Fragment() {
         return inflater.inflate(R.layout.translate_fragment, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(TranslateViewModel::class.java)
-        // TODO: Use the ViewModel
-    }
+//    override fun onActivityCreated(savedInstanceState: Bundle?) {
+//        super.onActivityCreated(savedInstanceState)
+//        viewModel = ViewModelProviders.of(this).get(TranslateViewModel::class.java)
+//        // TODO: Use the ViewModel
+//    }
 
 }

@@ -17,17 +17,12 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val host by lazy { NavHostFragment.create(R.navigation.dictionary_navigation) }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        fragmentNavigator()
-        if (savedInstanceState == null) {
-            setupBottomNavigationBar()
-        }
+        fragmentNavigator(TranslateFragment.newInstance())
+        setupBottomNavigationBar()
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -35,24 +30,30 @@ class MainActivity : AppCompatActivity() {
         setupBottomNavigationBar()
     }
 
-    private fun fragmentNavigator() {
+    private fun fragmentNavigator(fragment: Fragment) {
 //        val bluetoothFragment = CurrentWeatherFragment.newInstance()
         supportFragmentManager.beginTransaction()
-            .replace(R.id.mainContainer, host)
+            .replace(R.id.mainContainer, fragment)
             .commit()
     }
 
     private fun setupBottomNavigationBar() {
-        val navController = host.findNavController()
-        bottomNavigation?.setupWithNavController(navController)
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            val dest: String = try {
-                resources.getResourceName(destination.id)
-            } catch (e: Resources.NotFoundException) {
-                println(e.message)
-                e.localizedMessage
+        bottomNavigation.setOnNavigationItemSelectedListener {
+            when(it.itemId) {
+                R.id.translatePage -> {
+                    fragmentNavigator(TranslateFragment.newInstance())
+                    true
+                }
+                R.id.dictionaryPage -> {
+                    fragmentNavigator(DictionaryFragment.newInstance())
+                    true
+                }
+                R.id.settingsPage -> {
+                    fragmentNavigator(SettingsFragment.newInstance())
+                    true
+                }
+                else -> false
             }
-            Log.d("NavigationActivity", "Navigated to $dest")
         }
     }
 }
