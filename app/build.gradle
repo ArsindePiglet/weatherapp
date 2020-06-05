@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
@@ -48,4 +49,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'], exclude: [])
     implementation deps.navigation_fr
     implementation deps.navigation_ui
+    implementation deps.room_runtime
+    kapt deps.room_compiler
 }
+
+apply plugin: 'com.google.gms.google-services'

@@ -7,4 +7,10 @@
     <string name="bottom_menu_words">words</string>
     <string name="bottom_menu_dictionary">dictionary</string>
     <string name="bottom_menu_settings">settings</string>
+
+
+    <string name="bluetooth_device_title">Bluetooth Device Title</string>
+    <string name="bluetooth_device_subtitle">11:22:33:44:55:66:77</string>
+    <string name="fragment_discover_devices">Start track devices</string>
+    <string name="fragment_stop_discover_devices">Stop track devices</string>
 </resources>

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "128060213476",
+    "firebase_url": "https://bleapp-5500c.firebaseio.com",
+    "project_id": "bleapp-5500c",
+    "storage_bucket": "bleapp-5500c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:128060213476:android:a4f601c48582ce68ae44f1",
+        "android_client_info": {
+          "package_name": "com.arsinde.weatherapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "128060213476-uo9ve7g1qa6kir26t83u7m34kc9ufiaq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSZU3aHmzLC237C_Ua2dBKCDb1vIxQfBE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "128060213476-uo9ve7g1qa6kir26t83u7m34kc9ufiaq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

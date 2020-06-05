@@ -1,11 +1,11 @@
 package com.arsinde.weatherapp.features.dictionary
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.arsinde.weatherapp.R
 
 class TranslateFragment : Fragment() {
@@ -14,19 +14,10 @@ class TranslateFragment : Fragment() {
         fun newInstance() = TranslateFragment()
     }
 
-//    private lateinit var viewModel: TranslateViewModel
+    private val vm: TranslateViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.translate_fragment, container, false)
-    }
-
-//    override fun onActivityCreated(savedInstanceState: Bundle?) {
-//        super.onActivityCreated(savedInstanceState)
-//        viewModel = ViewModelProviders.of(this).get(TranslateViewModel::class.java)
-//        // TODO: Use the ViewModel
-//    }
-
+    ): View? = inflater.inflate(R.layout.translate_fragment, container, false)
 }

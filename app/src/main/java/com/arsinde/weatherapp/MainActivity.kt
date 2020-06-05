@@ -1,17 +1,10 @@
 package com.arsinde.weatherapp
 
-import android.content.res.Resources
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.setupWithNavController
-import com.arsinde.weatherapp.features.dictionary.DictionaryFragment
+import com.arsinde.weatherapp.features.ble.BleFragment
 import com.arsinde.weatherapp.features.dictionary.SettingsFragment
-import com.arsinde.weatherapp.features.dictionary.TranslateFragment
 import com.arsinde.weatherapp.features.weather.CurrentWeatherFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -21,7 +14,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        fragmentNavigator(TranslateFragment.newInstance())
+        fragmentNavigator(BleFragment.newInstance())
         setupBottomNavigationBar()
     }
 
@@ -31,7 +24,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fragmentNavigator(fragment: Fragment) {
-//        val bluetoothFragment = CurrentWeatherFragment.newInstance()
         supportFragmentManager.beginTransaction()
             .replace(R.id.mainContainer, fragment)
             .commit()
@@ -39,13 +31,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupBottomNavigationBar() {
         bottomNavigation.setOnNavigationItemSelectedListener {
-            when(it.itemId) {
+            when (it.itemId) {
                 R.id.translatePage -> {
-                    fragmentNavigator(TranslateFragment.newInstance())
+                    fragmentNavigator(BleFragment.newInstance())
                     true
                 }
                 R.id.dictionaryPage -> {
-                    fragmentNavigator(DictionaryFragment.newInstance())
+                    fragmentNavigator(CurrentWeatherFragment.newInstance())
                     true
                 }
                 R.id.settingsPage -> {
