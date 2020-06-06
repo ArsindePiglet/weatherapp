@@ -1,4 +1,4 @@
-package com.arsinde.weatherapp.features.dictionary
+package com.arsinde.weatherapp.features.components
 
 import android.os.Bundle
 import android.view.LayoutInflater

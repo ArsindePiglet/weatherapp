@@ -1,6 +1,7 @@
 package com.arsinde.weatherapp.features.ble
 
 import android.bluetooth.*
+import android.bluetooth.BluetoothGatt.GATT_SUCCESS
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,9 +12,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.arsinde.weatherapp.R
+import com.arsinde.weatherapp.adapters.BluetoothDevicesAdapter
 import com.arsinde.weatherapp.dialogs.CurrentWeatherDialog
+import com.arsinde.weatherapp.models.ble.BleViewModel
 import kotlinx.android.synthetic.main.ble_fragment.*
 import java.util.*
+
 
 class BleFragment : Fragment() {
 
@@ -58,22 +62,28 @@ class BleFragment : Fragment() {
                 println("Device: ${device.deviceName}:${device.deviceAddress}")
             }
             progressBar.hide()
-            val btdAdapter = BluetoothDevicesAdapter(it.toList(), BleClickListener { device ->
-                val dialog = CurrentWeatherDialog("${device.deviceName}:${device.deviceAddress}")
-                dialog.show(
-                    childFragmentManager,
-                    TAG
-                )
-                val leDevice = viewModel.bluetoothAdapter?.getRemoteDevice(device.deviceAddress)
-                leDevice?.let { bd ->
-                    val deviceGatt: BluetoothGatt = bd.connectGatt(
-                        context,
-                        true,
-                        gattCallback,
-                        BluetoothDevice.TRANSPORT_LE
-                    )
-                }
-            })
+            val btdAdapter =
+                BluetoothDevicesAdapter(
+                    it.toList(),
+                    BleClickListener { device ->
+                        val dialog =
+                            CurrentWeatherDialog("${device.deviceName}:${device.deviceAddress}")
+                        dialog.show(
+                            childFragmentManager,
+                            TAG
+                        )
+                        val leDevice =
+                            viewModel.bluetoothAdapter?.getRemoteDevice(device.deviceAddress)
+                        leDevice?.createBond()
+                        leDevice?.let { bd ->
+                            val deviceGatt: BluetoothGatt = bd.connectGatt(
+                                context,
+                                true,
+                                gattCallback,
+                                BluetoothDevice.TRANSPORT_LE
+                            )
+                        }
+                    })
             bluetoothDevices.apply {
                 layoutManager = viewLayoutManager
                 adapter = btdAdapter
@@ -99,6 +109,31 @@ class BleFragment : Fragment() {
             }
             println("BluetoothGattCharacteristic: ${characteristic.uuid}")
 
+        }
+
+        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+            if (status != GATT_SUCCESS) {
+                println(
+                    "service discovery failed due to internal error '%s', disconnecting")
+//                disconnect()
+                return
+            }
+            val services = gatt.services
+            services.forEach {
+                println("Service: ${it.uuid} & ${it.type}")
+                it.characteristics.forEach {ch ->
+
+                }
+            }
+            println(String.format("discovered %d services for '%s'", services.size, gatt.device.name))
+//            if (listener != null) {
+//                listener.connected(this@BluetoothPeripheral)
+//            }
+//            callbackHandler.post(Runnable { peripheralCallback.onServicesDiscovered(this@BluetoothPeripheral) })
+        }
+
+        override fun onReadRemoteRssi(gatt: BluetoothGatt?, rssi: Int, status: Int) {
+            println("RSSI: $rssi")
         }
 
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {

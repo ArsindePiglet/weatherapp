@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.arsinde.weatherapp.features.ble.BleFragment
-import com.arsinde.weatherapp.features.dictionary.SettingsFragment
+import com.arsinde.weatherapp.features.components.SettingsFragment
 import com.arsinde.weatherapp.features.weather.CurrentWeatherFragment
 import kotlinx.android.synthetic.main.activity_main.*
 

@@ -1,10 +1,12 @@
-package com.arsinde.weatherapp.features.ble
+package com.arsinde.weatherapp.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.arsinde.weatherapp.R
+import com.arsinde.weatherapp.features.ble.BleClickListener
+import com.arsinde.weatherapp.features.ble.BluetoothDeviceInfo
 import kotlinx.android.synthetic.main.card_bluetooth_device_info.view.*
 
 class BluetoothDevicesAdapter(
@@ -27,7 +29,9 @@ class BluetoothDevicesAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BluetoothDeviceViewHolder {
         val card = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_bluetooth_device_info, parent, false)
-        return BluetoothDeviceViewHolder(card)
+        return BluetoothDeviceViewHolder(
+            card
+        )
     }
 
     override fun getItemCount(): Int = deviceInfos.size

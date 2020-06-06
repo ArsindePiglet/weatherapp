@@ -1,7 +1,6 @@
-package com.arsinde.weatherapp.features.ble
+package com.arsinde.weatherapp.models.ble
 
 import android.app.Application
-import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -11,13 +10,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Handler
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.arsinde.weatherapp.ITrack
-import com.arsinde.weatherapp.ITrackServiceResponseListener
-import kotlinx.coroutines.*
+import com.arsinde.weatherapp.features.ble.BluetoothDeviceInfo
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class BleViewModel(private val app: Application) : AndroidViewModel(app) {
 
@@ -34,9 +32,15 @@ class BleViewModel(private val app: Application) : AndroidViewModel(app) {
     fun scanLeDevices() {
         viewModelScope.launch {
             startLEScan {
-                it?.let {device ->
+                it?.let { device ->
                     if (device.name != null) {
-                        _deviceList.add(BluetoothDeviceInfo(device.name, device.address, device))
+                        _deviceList.add(
+                            BluetoothDeviceInfo(
+                                device.name,
+                                device.address,
+                                device
+                            )
+                        )
                     }
                 }
             }
@@ -63,6 +67,7 @@ class BleViewModel(private val app: Application) : AndroidViewModel(app) {
             context.unregisterReceiver(bluetoothStateReceiver)
         }
     }
+
     private var leScanCallback: ScanCallback? = null
 
     private fun startLEScan(doOnDeviceFound: (BluetoothDevice?) -> Unit) {
