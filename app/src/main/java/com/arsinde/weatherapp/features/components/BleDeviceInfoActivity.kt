@@ -27,11 +27,13 @@ class BleDeviceInfoActivity : FragmentActivity() {
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             bluetoothLeService = null
+            isConnected = false
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            bluetoothLeService = (service as BluetoothLeService.LocalBinder).service
+            bluetoothLeService = (service as BluetoothLeService.LocalBinder).getService()
             bluetoothLeService?.connect(deviceAddress)
+            isConnected = true
         }
 
     }
@@ -80,6 +82,9 @@ class BleDeviceInfoActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.ble_device_info_dialog_activity)
+
+        val gattServiceIntent = Intent(this, BluetoothLeService::class.java)
+        bindService(gattServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
     override fun onStart() {

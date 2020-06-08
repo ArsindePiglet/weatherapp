@@ -22,36 +22,42 @@ const val EXTRA_DATA = "com.arsinde.weatherapp.EXTRA_DATA"
 
 class BluetoothLeService : Service() {
 
-    private var bluetoothManager: BluetoothManager? = null
-    private var bluetoothAdapter: BluetoothAdapter? = null
+    //    private var bluetoothManager: BluetoothManager? = null
+    private val bluetoothAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE) {
+        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        bluetoothManager.adapter
+    }
     private var bluetoothDeviceAddress: String? = null
     private var bluetoothGatt: BluetoothGatt? = null
 
-    init {
-        // For API level 18 and above, get a reference to BluetoothAdapter through
-        // BluetoothManager.
-
-        // For API level 18 and above, get a reference to BluetoothAdapter through
-        // BluetoothManager.
-        if (bluetoothManager == null) {
-            bluetoothManager =
-                getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-            if (bluetoothManager == null) {
-                Log.e(TAG, "Unable to initialize BluetoothManager.")
-            }
-        }
-
-        bluetoothManager?.let {
-            bluetoothAdapter = it.adapter
-            if (bluetoothAdapter == null) {
-                Log.e(TAG, "Unable to obtain a BluetoothAdapter.")
-            }
-        }
-    }
+//    init {
+//        // For API level 18 and above, get a reference to BluetoothAdapter through
+//        // BluetoothManager.
+//
+//        // For API level 18 and above, get a reference to BluetoothAdapter through
+//        // BluetoothManager.
+//        if (bluetoothManager == null) {
+//            bluetoothManager =
+//                getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+//            if (bluetoothManager == null) {
+//                Log.e(TAG, "Unable to initialize BluetoothManager.")
+//            }
+//        }
+//
+//        bluetoothManager?.let {
+//            bluetoothAdapter = it.adapter
+//            if (bluetoothAdapter == null) {
+//                Log.e(TAG, "Unable to obtain a BluetoothAdapter.")
+//            }
+//        }
+//    }
 
     class LocalBinder : Binder() {
-        val service: BluetoothLeService
-            get() = BluetoothLeService()
+        fun getService(): BluetoothLeService {
+            return BluetoothLeService()
+        }
+//        val service: BluetoothLeService
+//            get() =
     }
 
     private val binder = LocalBinder()
@@ -171,42 +177,23 @@ class BluetoothLeService : Service() {
      * `BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)`
      * callback.
      */
-    fun connect(address: String?): Boolean {
-        if (bluetoothAdapter == null || address == null) {
-            Log.w(
-                TAG,
-                "BluetoothAdapter not initialized or unspecified address."
+    fun connect(address: String): Boolean {
+        val leDevice = bluetoothAdapter?.getRemoteDevice(address)
+        return if (leDevice != null) {
+            leDevice.connectGatt(
+                this,
+                true,
+                gattCallback,
+                BluetoothDevice.TRANSPORT_LE
             )
-            return false
-        }
-
-        // Previously connected device.  Try to reconnect.
-        bluetoothGatt?.let {
-            if (bluetoothDeviceAddress != null && address == bluetoothDeviceAddress && bluetoothGatt != null) {
-                Log.d(
-                    TAG,
-                    "Trying to use an existing mBluetoothGatt for connection."
-                )
-                return if (it.connect()) {
-                    connectionState = STATE_CONNECTING
-                    true
-                } else {
-                    false
-                }
-            }
-        }
-        val device: BluetoothDevice = bluetoothAdapter?.getRemoteDevice(address) ?: kotlin.run{
+            Log.d(TAG, "Trying to create a new connection.")
+            bluetoothDeviceAddress = address
+            connectionState = STATE_CONNECTING
+            true
+        } else {
             Log.w(TAG, "Device not found.  Unable to connect.")
-            return false
+            false
         }
-
-        // We want to directly connect to the device, so we are setting the autoConnect
-        // parameter to false.
-        bluetoothGatt = device.connectGatt(this, false, gattCallback)
-        Log.d(TAG, "Trying to create a new connection.")
-        bluetoothDeviceAddress = address
-        connectionState = STATE_CONNECTING
-        return true
     }
 
     /**
@@ -256,11 +243,11 @@ class BluetoothLeService : Service() {
 
         // This is specific to Heart Rate Measurement.
 //        if (BluetoothLeService.UUID_HEART_RATE_MEASUREMENT == characteristic.uuid) {
-            val descriptor = characteristic.getDescriptor(
-                UUID.fromString(TimeProfile.CURRENT_TIME.toString())
-            )
-            descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-            bluetoothGatt?.writeDescriptor(descriptor)
+        val descriptor = characteristic.getDescriptor(
+            UUID.fromString(TimeProfile.CURRENT_TIME.toString())
+        )
+        descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+        bluetoothGatt?.writeDescriptor(descriptor)
 //        }
     }
 
