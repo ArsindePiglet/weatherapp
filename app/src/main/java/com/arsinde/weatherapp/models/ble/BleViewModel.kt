@@ -6,10 +6,7 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -47,24 +44,6 @@ class BleViewModel(private val app: Application) : AndroidViewModel(app) {
             delay(5000)
             stopLEScan()
             leDevices.postValue(_deviceList)
-        }
-    }
-
-    private fun enableBluetooth(context: Context) { //private fun enableBluetooth(context: Context, onBtEnabledAction: Runnable)
-        val bluetoothStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent?) {
-                println("Bluetooth is enabled now!")
-                //TODO result onBtEnabledAction.run()
-                context.unregisterReceiver(this)
-            }
-        }
-        context.registerReceiver(
-            bluetoothStateReceiver,
-            IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
-        )
-        if (!BluetoothAdapter.getDefaultAdapter().enable()) {
-            println("Bluetooth is enabled!")
-            context.unregisterReceiver(bluetoothStateReceiver)
         }
     }
 

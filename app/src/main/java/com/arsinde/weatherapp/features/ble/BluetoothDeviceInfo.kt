@@ -7,7 +7,3 @@ data class BluetoothDeviceInfo(
     val deviceAddress: String,
     val device: BluetoothDevice
 )
-
-data class DevicesInfoList(
-    val list: MutableList<BluetoothDeviceInfo> = mutableListOf()
-)

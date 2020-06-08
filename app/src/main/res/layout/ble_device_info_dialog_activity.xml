@@ -66,7 +66,17 @@
             android:text="@string/no_data"
             android:textSize="18sp"/>
     </LinearLayout>
-    <ExpandableListView android:id="@+id/gatt_services_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+<!--    <ExpandableListView android:id="@+id/gatt_services_list"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"/>-->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnConnect"
+        style="@style/btnStyle"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:paddingVertical="@dimen/padding_vertical_text"
+        android:paddingHorizontal="@dimen/padding_horizontal_text"
+        android:text="@string/connect_to_device" />
 </LinearLayout>

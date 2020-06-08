@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,28 +8,6 @@
     android:orientation="vertical"
     android:keepScreenOn="true"
     tools:context=".features.components.SettingsFragment">
-
-    <androidx.core.widget.ContentLoadingProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:indeterminateDrawable="@drawable/spinner_ring"
-        android:indeterminateOnly="true"
-        android:visibility="gone" />
-
-<!--    <androidx.recyclerview.widget.RecyclerView-->
-<!--        android:id="@+id/rvSettings"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"-->
-<!--        android:scrollbars="vertical"-->
-<!--        android:layout_marginBottom="8dp"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintBottom_toTopOf="@id/btnStartService"-->
-<!--        />-->
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvSystemTime"
@@ -44,28 +23,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnStartService"
-        style="@style/btnStyle"
-        android:layout_width="0dp"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvStartServiceResult"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:paddingHorizontal="@dimen/padding_horizontal_text"
-        android:text="@string/start_service"
-        app:layout_constraintBottom_toTopOf="@id/btnDiscover"
-        app:layout_constraintEnd_toEndOf="@+id/btnDiscover"
-        app:layout_constraintStart_toStartOf="@+id/btnDiscover" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnDiscover"
-        style="@style/btnStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:layout_marginHorizontal="32dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textAllCaps="true"
+        android:textColor="@color/pic_orange"
+        android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="16dp"
         android:paddingHorizontal="@dimen/padding_horizontal_text"
-        android:text="@string/discover_services" />
+        tools:text="@string/discover_services"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

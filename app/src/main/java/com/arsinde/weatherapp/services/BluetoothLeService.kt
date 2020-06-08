@@ -22,47 +22,28 @@ const val EXTRA_DATA = "com.arsinde.weatherapp.EXTRA_DATA"
 
 class BluetoothLeService : Service() {
 
-    //    private var bluetoothManager: BluetoothManager? = null
-    private val bluetoothAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE) {
-        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        bluetoothManager.adapter
-    }
+    private lateinit var bluetoothManager: BluetoothManager
+    private lateinit var bluetoothAdapter: BluetoothAdapter
     private var bluetoothDeviceAddress: String? = null
     private var bluetoothGatt: BluetoothGatt? = null
 
-//    init {
-//        // For API level 18 and above, get a reference to BluetoothAdapter through
-//        // BluetoothManager.
-//
-//        // For API level 18 and above, get a reference to BluetoothAdapter through
-//        // BluetoothManager.
-//        if (bluetoothManager == null) {
-//            bluetoothManager =
-//                getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-//            if (bluetoothManager == null) {
-//                Log.e(TAG, "Unable to initialize BluetoothManager.")
-//            }
-//        }
-//
-//        bluetoothManager?.let {
-//            bluetoothAdapter = it.adapter
-//            if (bluetoothAdapter == null) {
-//                Log.e(TAG, "Unable to obtain a BluetoothAdapter.")
-//            }
-//        }
-//    }
-
-    class LocalBinder : Binder() {
-        fun getService(): BluetoothLeService {
-            return BluetoothLeService()
-        }
-//        val service: BluetoothLeService
-//            get() =
+    override fun onCreate() {
+        bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        println("Bluetooth manager is initialized")
+        bluetoothAdapter = bluetoothManager.adapter
+        println("Bluetooth adapter is initialized")
     }
 
     private val binder = LocalBinder()
 
     override fun onBind(intent: Intent?): IBinder? = binder
+
+    inner class LocalBinder : Binder() {
+        fun getService(): BluetoothLeService {
+            return this@BluetoothLeService
+        }
+    }
+
 
     override fun onUnbind(intent: Intent?): Boolean {
         /**
@@ -83,32 +64,69 @@ class BluetoothLeService : Service() {
             newState: Int
         ) {
             val intentAction: String
-            when (newState) {
-                BluetoothProfile.STATE_CONNECTED -> {
-                    intentAction = ACTION_GATT_CONNECTED
-                    connectionState = STATE_CONNECTED
-                    broadcastUpdate(intentAction)
-                    Log.i(TAG, "Connected to GATT server.")
-                    Log.i(
-                        TAG, "Attempting to start service discovery: " +
-                                bluetoothGatt?.discoverServices()
-                    )
+            when (status) {
+                BluetoothGatt.GATT_SUCCESS -> {
+                    println("onConnectionStateChange: SUCCESS")
+                    when (newState) {
+                        BluetoothProfile.STATE_CONNECTED -> {
+                            println("onConnectionStateChange: le device connected")
+
+                            intentAction = ACTION_GATT_CONNECTED
+                            connectionState = STATE_CONNECTED
+                            broadcastUpdate(intentAction)
+                            Log.i(TAG, "Connected to GATT server.")
+                            Log.i(
+                                TAG, "Attempting to start service discovery: " +
+                                        bluetoothGatt?.discoverServices()
+                            )
+
+                            gatt.discoverServices()
+                        }
+                        BluetoothProfile.STATE_DISCONNECTED -> {
+                            println("onConnectionStateChange: le device disconnected")
+                            gatt.close()
+                            intentAction = ACTION_GATT_DISCONNECTED
+                            connectionState = STATE_DISCONNECTED
+                            Log.i(TAG, "Disconnected from GATT server.")
+                            broadcastUpdate(intentAction)
+                        }
+                    }
                 }
-                BluetoothProfile.STATE_DISCONNECTED -> {
-                    intentAction = ACTION_GATT_DISCONNECTED
-                    connectionState = STATE_DISCONNECTED
-                    Log.i(TAG, "Disconnected from GATT server.")
-                    broadcastUpdate(intentAction)
+                BluetoothGatt.GATT_FAILURE -> {
+                    println("onConnectionStateChange: BluetoothGatt.GATT_FAILURE")
+                }
+                else -> {
+                    println("onConnectionStateChange: $status")
+                    gatt.close()
+
                 }
             }
         }
 
         // New services discovered
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
-            when (status) {
-                BluetoothGatt.GATT_SUCCESS -> broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED)
-                else -> Log.w(TAG, "onServicesDiscovered received: $status")
+            if (status != BluetoothGatt.GATT_SUCCESS) {
+                println(
+                    "service discovery failed due to internal error '%s', disconnecting"
+                )
+                Log.w(TAG, "onServicesDiscovered received: $status")
+                return
             }
+            val services = gatt.services
+            broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED)
+            services.forEach {
+                println("Service: ${it.uuid} & ${it.type}")
+                it.characteristics.forEach { ch ->
+
+                }
+            }
+            println(
+                String.format(
+                    "discovered %d services for '%s'",
+                    services.size,
+                    gatt.device.name
+                )
+            )
         }
 
         // Result of a characteristic read operation
@@ -178,20 +196,25 @@ class BluetoothLeService : Service() {
      * callback.
      */
     fun connect(address: String): Boolean {
-        val leDevice = bluetoothAdapter?.getRemoteDevice(address)
-        return if (leDevice != null) {
-            leDevice.connectGatt(
-                this,
-                true,
-                gattCallback,
-                BluetoothDevice.TRANSPORT_LE
-            )
-            Log.d(TAG, "Trying to create a new connection.")
-            bluetoothDeviceAddress = address
-            connectionState = STATE_CONNECTING
-            true
+        return if (bluetoothAdapter != null) {
+            val leDevice = bluetoothAdapter?.getRemoteDevice(address)
+            return if (leDevice != null) {
+                leDevice.connectGatt(
+                    this,
+                    true,
+                    gattCallback,
+                    BluetoothDevice.TRANSPORT_LE
+                )
+                Log.d(TAG, "Trying to create a new connection.")
+                bluetoothDeviceAddress = address
+                connectionState = STATE_CONNECTING
+                true
+            } else {
+                Log.w(TAG, "Device not found.  Unable to connect.")
+                false
+            }
         } else {
-            Log.w(TAG, "Device not found.  Unable to connect.")
+            Log.d(TAG, "Bluetooth adapter is null.")
             false
         }
     }

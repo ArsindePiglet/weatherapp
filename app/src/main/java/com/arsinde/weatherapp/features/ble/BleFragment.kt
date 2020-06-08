@@ -1,8 +1,7 @@
 package com.arsinde.weatherapp.features.ble
 
 import android.Manifest
-import android.bluetooth.*
-import android.bluetooth.BluetoothGatt.GATT_SUCCESS
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -15,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.arsinde.weatherapp.BuildConfig
 import com.arsinde.weatherapp.R
 import com.arsinde.weatherapp.adapters.BluetoothDevicesAdapter
 import com.arsinde.weatherapp.features.components.BleDeviceInfoActivity
@@ -22,17 +22,13 @@ import com.arsinde.weatherapp.features.components.DEVICE_ADDRESS
 import com.arsinde.weatherapp.features.components.DEVICE_NAME
 import com.arsinde.weatherapp.models.ble.BleViewModel
 import kotlinx.android.synthetic.main.ble_fragment.*
-import java.util.*
 
 
 const val REQUEST_LOCATION = 101
 
 class BleFragment : Fragment() {
 
-    //TODO add the check of the Location permissions
-
     companion object {
-        private val TAG: String = BleFragment::javaClass.name
         fun newInstance() = BleFragment()
     }
 
@@ -92,8 +88,10 @@ class BleFragment : Fragment() {
             println("ServiceResponse^ $it")
         })
         viewModel.leDevices.observe(viewLifecycleOwner, Observer {
-            it.forEach { device ->
-                println("Device: ${device.deviceName}:${device.deviceAddress}")
+            if (BuildConfig.DEBUG) {
+                it.forEach { device ->
+                    println("Device: ${device.deviceName}:${device.deviceAddress}")
+                }
             }
             progressBar.hide()
             val btdAdapter =
@@ -105,96 +103,11 @@ class BleFragment : Fragment() {
                         intent.putExtra(DEVICE_ADDRESS, device.deviceAddress)
 
                         startActivity(intent)
-
-//                        val dialog =
-//                            CurrentWeatherDialog("${device.deviceName}:${device.deviceAddress}")
-//                        dialog.show(
-//                            childFragmentManager,
-//                            TAG
-//                        )
-//                        val leDevice =
-//                            viewModel.bluetoothAdapter?.getRemoteDevice(device.deviceAddress)
-//                        leDevice?.createBond()
-//                        leDevice?.let { bd ->
-//                            val deviceGatt: BluetoothGatt = bd.connectGatt(
-//                                context,
-//                                true,
-//                                gattCallback,
-//                                BluetoothDevice.TRANSPORT_LE
-//                            )
-//                        }
                     })
             bluetoothDevices.apply {
                 layoutManager = viewLayoutManager
                 adapter = btdAdapter
             }
         })
-    }
-
-    private val gattCallback = object : BluetoothGattCallback() {
-        override fun onCharacteristicRead(
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic,
-            status: Int
-        ) {
-            if (status != BluetoothGatt.GATT_SUCCESS) {
-                println(
-                    String.format(
-                        Locale.ENGLISH,
-                        "ERROR: Read failed for characteristic: %s, status %d",
-                        characteristic.uuid,
-                        status
-                    )
-                )
-            }
-            println("BluetoothGattCharacteristic: ${characteristic.uuid}")
-
-        }
-
-        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
-            if (status != GATT_SUCCESS) {
-                println(
-                    "service discovery failed due to internal error '%s', disconnecting"
-                )
-                return
-            }
-            val services = gatt.services
-            services.forEach {
-                println("Service: ${it.uuid} & ${it.type}")
-                it.characteristics.forEach { ch ->
-
-                }
-            }
-            println(
-                String.format(
-                    "discovered %d services for '%s'",
-                    services.size,
-                    gatt.device.name
-                )
-            )
-        }
-
-        override fun onReadRemoteRssi(gatt: BluetoothGatt?, rssi: Int, status: Int) {
-            println("RSSI: $rssi")
-        }
-
-        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                println("onConnectionStateChange: SUCCESS")
-                if (newState == BluetoothProfile.STATE_CONNECTED) {
-                    println("onConnectionStateChange: le device connected")
-
-                    gatt.discoverServices()
-                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                    println("onConnectionStateChange: le device disconnected")
-                    gatt.close()
-                }
-            } else if (status == BluetoothGatt.GATT_FAILURE) {
-                println("onConnectionStateChange: BluetoothGatt.GATT_FAILURE")
-            } else {
-                println("onConnectionStateChange: $status")
-                gatt.close()
-            }
-        }
     }
 }

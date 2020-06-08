@@ -4,16 +4,14 @@ import android.bluetooth.BluetoothGattService
 import android.content.*
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
-import android.widget.SimpleExpandableListAdapter
 import androidx.fragment.app.FragmentActivity
+import com.arsinde.weatherapp.BuildConfig
 import com.arsinde.weatherapp.R
 import com.arsinde.weatherapp.services.*
 import kotlinx.android.synthetic.main.ble_device_info_dialog_activity.*
 
 const val DEVICE_NAME = "device_name"
 const val DEVICE_ADDRESS = "device_address"
-private const val TAG = "BleDeviceInfoActivity"
 
 class BleDeviceInfoActivity : FragmentActivity() {
 
@@ -32,7 +30,6 @@ class BleDeviceInfoActivity : FragmentActivity() {
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             bluetoothLeService = (service as BluetoothLeService.LocalBinder).getService()
-            bluetoothLeService?.connect(deviceAddress)
             isConnected = true
         }
 
@@ -40,8 +37,7 @@ class BleDeviceInfoActivity : FragmentActivity() {
 
     private val gattUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            val action = intent?.action
-            when(action) {
+            when (intent?.action) {
                 ACTION_GATT_CONNECTED -> {
                     isConnected = true
                     updateConnectionState(R.string.connected)
@@ -69,7 +65,6 @@ class BleDeviceInfoActivity : FragmentActivity() {
     }
 
     private fun clearUI() {
-        gatt_services_list.setAdapter(null as? SimpleExpandableListAdapter)
         data_value.setText(R.string.no_data)
     }
 
@@ -91,6 +86,12 @@ class BleDeviceInfoActivity : FragmentActivity() {
         super.onStart()
         device_name.text = deviceName
         device_address.text = deviceAddress
+
+        btnConnect.setOnClickListener {
+            if (isConnected) {
+                bluetoothLeService?.connect(deviceAddress)
+            }
+        }
     }
 
     override fun onResume() {
@@ -98,10 +99,9 @@ class BleDeviceInfoActivity : FragmentActivity() {
         registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter())
         if (bluetoothLeService != null) {
             val result = bluetoothLeService?.connect(deviceAddress)
-            Log.d(
-                TAG,
-                "Connect request result=$result"
-            )
+            if (BuildConfig.DEBUG) {
+                println("Connect request result=$result")
+            }
         }
     }
 

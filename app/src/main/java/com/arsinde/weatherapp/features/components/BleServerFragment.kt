@@ -19,7 +19,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import com.arsinde.weatherapp.BuildConfig
 import com.arsinde.weatherapp.R
 import com.arsinde.weatherapp.services.TimeProfile
 import kotlinx.android.synthetic.main.settings_fragment.*
@@ -32,8 +32,6 @@ class SettingsFragment : Fragment() {
     companion object {
         fun newInstance() = SettingsFragment()
     }
-
-    private val viewModel: SettingsViewModel by viewModels()
 
     /* Collection of notification subscribers */
     private val registeredDevices = mutableSetOf<BluetoothDevice>()
@@ -100,10 +98,13 @@ class SettingsFragment : Fragment() {
     private val gattServerCallback = object : BluetoothGattServerCallback() {
         override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.i(TAG, "BluetoothDevice CONNECTED: $device")
+                if (BuildConfig.DEBUG) {
+                    Log.i(TAG, "BluetoothDevice CONNECTED: $device")
+                }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.i(TAG, "BluetoothDevice DISCONNECTED: $device")
-                //Remove device from any active subscriptions
+                if (BuildConfig.DEBUG) {
+                    Log.i(TAG, "BluetoothDevice DISCONNECTED: $device")
+                }
                 registeredDevices.remove(device)
             }
         }
@@ -117,7 +118,9 @@ class SettingsFragment : Fragment() {
             val now = System.currentTimeMillis()
             when {
                 TimeProfile.CURRENT_TIME == characteristic?.uuid -> {
-                    Log.i(TAG, "Read CurrentTime")
+                    if (BuildConfig.DEBUG) {
+                        Log.i(TAG, "Read CurrentTime")
+                    }
                     bluetoothGattServer?.sendResponse(
                         device,
                         requestId,
@@ -127,7 +130,9 @@ class SettingsFragment : Fragment() {
                     )
                 }
                 TimeProfile.LOCAL_TIME_INFO == characteristic?.uuid -> {
-                    Log.i(TAG, "Read LocalTimeInfo")
+                    if (BuildConfig.DEBUG) {
+                        Log.i(TAG, "Read LocalTimeInfo")
+                    }
                     bluetoothGattServer?.sendResponse(
                         device,
                         requestId,
@@ -137,8 +142,9 @@ class SettingsFragment : Fragment() {
                     )
                 }
                 else -> {
-                    // Invalid characteristic
-                    Log.w(TAG, "Invalid Characteristic Read: " + characteristic?.uuid)
+                    if (BuildConfig.DEBUG) {
+                        Log.w(TAG, "Invalid Characteristic Read: " + characteristic?.uuid)
+                    }
                     bluetoothGattServer?.sendResponse(
                         device,
                         requestId,
@@ -157,7 +163,9 @@ class SettingsFragment : Fragment() {
             descriptor: BluetoothGattDescriptor?
         ) {
             if (TimeProfile.CLIENT_CONFIG == descriptor?.uuid) {
-                Log.d(TAG, "Config descriptor read")
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "Config descriptor read")
+                }
                 val returnValue = if (registeredDevices.contains(device)) {
                     BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
                 } else {
@@ -171,7 +179,9 @@ class SettingsFragment : Fragment() {
                     returnValue
                 )
             } else {
-                Log.w(TAG, "Unknown descriptor read request")
+                if (BuildConfig.DEBUG) {
+                    Log.w(TAG, "Unknown descriptor read request")
+                }
                 bluetoothGattServer?.sendResponse(
                     device,
                     requestId,
@@ -193,14 +203,18 @@ class SettingsFragment : Fragment() {
             if (TimeProfile.CLIENT_CONFIG == descriptor?.uuid) {
                 device?.let {
                     if (Arrays.equals(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE, value)) {
-                        Log.d(TAG, "Subscribe device to notifications: $it")
+                        if (BuildConfig.DEBUG) {
+                            Log.d(TAG, "Subscribe device to notifications: $it")
+                        }
                         registeredDevices.add(it)
                     } else if (Arrays.equals(
                             BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE,
                             value
                         )
                     ) {
-                        Log.d(TAG, "Unsubscribe device from notifications: $it")
+                        if (BuildConfig.DEBUG) {
+                            Log.d(TAG, "Unsubscribe device from notifications: $it")
+                        }
                         registeredDevices.remove(it)
                     }
 
@@ -214,7 +228,9 @@ class SettingsFragment : Fragment() {
                     }
                 }
             } else {
-                Log.w(TAG, "Unknown descriptor write request")
+                if (BuildConfig.DEBUG) {
+                    Log.w(TAG, "Unknown descriptor write request")
+                }
                 if (responseNeeded) {
                     bluetoothGattServer?.sendResponse(
                         device,
@@ -274,17 +290,17 @@ class SettingsFragment : Fragment() {
             val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
             context?.registerReceiver(bluetoothReceiver, filter)
             if (!bluetoothAdapter.isEnabled) {
-                Log.d(TAG, "Bluetooth is currently disabled...enabling")
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "Bluetooth is currently disabled...enabling")
+                }
                 bluetoothAdapter.enable()
             } else {
-                Log.d(TAG, "Bluetooth enabled...starting services")
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "Bluetooth enabled...starting services")
+                }
                 startAdvertising()
                 startServer()
             }
-        }
-
-        btnStartService.setOnClickListener {
-            viewModel.startService()
         }
     }
 
@@ -296,13 +312,17 @@ class SettingsFragment : Fragment() {
     private fun checkBluetoothSupport(bluetoothAdapter: BluetoothAdapter?): Boolean {
 
         if (bluetoothAdapter == null) {
-            Log.w(TAG, "Bluetooth is not supported")
+            if (BuildConfig.DEBUG) {
+                Log.w(TAG, "Bluetooth is not supported")
+            }
             return false
         }
 
         context?.packageManager?.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)?.let {
             if (!it) {
-                Log.w(TAG, "Bluetooth LE is not supported")
+                if (BuildConfig.DEBUG) {
+                    Log.w(TAG, "Bluetooth LE is not supported")
+                }
                 return false
             }
         }
@@ -380,7 +400,9 @@ class SettingsFragment : Fragment() {
         }
         val exactTime = TimeProfile.getExactTime(timestamp, adjustReason)
 
-        Log.i(TAG, "Sending update to ${registeredDevices.size} subscribers")
+        if (BuildConfig.DEBUG) {
+            Log.i(TAG, "Sending update to ${registeredDevices.size} subscribers")
+        }
         for (device in registeredDevices) {
             val timeCharacteristic = bluetoothGattServer
                 ?.getService(TimeProfile.TIME_SERVICE)
@@ -399,5 +421,6 @@ class SettingsFragment : Fragment() {
         val displayTime = DateFormat.getTimeFormat(context).format(date)
         val tmp = "$displayDate\n$displayTime"
         tvSystemTime?.text = tmp
+        tvStartServiceResult.setText(R.string.server_is_started)
     }
 }
