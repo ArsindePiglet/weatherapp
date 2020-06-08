@@ -227,29 +227,6 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-//        bluetoothManager = context?.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-//        val bluetoothAdapter = bluetoothManager.adapter
-//        // We can't continue without proper Bluetooth support
-//        if (!checkBluetoothSupport(bluetoothAdapter)) {
-//            Toast.makeText(context, "Bluetooth is not supported", Toast.LENGTH_LONG).show()
-//        } else {
-//            // Register for system Bluetooth events
-//            val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
-//            context?.registerReceiver(bluetoothReceiver, filter)
-//            if (!bluetoothAdapter.isEnabled) {
-//                Log.d(TAG, "Bluetooth is currently disabled...enabling")
-//                bluetoothAdapter.enable()
-//            } else {
-//                Log.d(TAG, "Bluetooth enabled...starting services")
-//                startAdvertising()
-//                startServer()
-//            }
-//        }
-    }
-
     override fun onStart() {
         super.onStart()
 
@@ -424,7 +401,6 @@ class SettingsFragment : Fragment() {
         val displayDate = DateFormat.getMediumDateFormat(context).format(date)
         val displayTime = DateFormat.getTimeFormat(context).format(date)
         val tmp = "$displayDate\n$displayTime"
-//        Toast.makeText(context, tmp, Toast.LENGTH_SHORT).show()
         tvSystemTime?.text = tmp
     }
 }
