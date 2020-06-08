@@ -15,7 +15,7 @@
     <string name="fragment_stop_discover_devices">Stop track devices</string>
 
     <string name="discover_services">Discover services</string>
-    <string name="start_service">Start service</string>
+    <string name="start_service">Start BLE server</string>
     <string name="service_title">Title</string>
     <string name="system_time">Time</string>
 

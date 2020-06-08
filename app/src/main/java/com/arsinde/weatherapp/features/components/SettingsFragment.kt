@@ -283,9 +283,6 @@ class SettingsFragment : Fragment() {
             }
         }
 
-        btnDiscover.setOnClickListener {
-            viewModel.getSystemServices()
-        }
         btnStartService.setOnClickListener {
             viewModel.startService()
         }
