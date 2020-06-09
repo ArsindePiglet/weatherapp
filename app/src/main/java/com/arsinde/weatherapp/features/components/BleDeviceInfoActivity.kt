@@ -47,7 +47,7 @@ class BleDeviceInfoActivity : FragmentActivity() {
                     updateConnectionState(R.string.disconnected)
                     clearUI()
                 }
-                ACTION_GATT_SERVICES_DISCOVERED -> displayGattServices(bluetoothLeServices.getSupportedGattServices())
+                ACTION_GATT_SERVICES_DISCOVERED -> displayGattServices(bluetoothLeService?.getSupportedGattServices())
                 ACTION_DATA_AVAILABLE -> displayData(intent.getStringExtra(EXTRA_DATA))
             }
         }

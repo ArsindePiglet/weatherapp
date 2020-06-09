@@ -199,6 +199,7 @@ class BluetoothLeService : Service() {
         return if (bluetoothAdapter != null) {
             val leDevice = bluetoothAdapter?.getRemoteDevice(address)
             return if (leDevice != null) {
+                leDevice.createBond()
                 leDevice.connectGatt(
                     this,
                     true,

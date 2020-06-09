@@ -1,15 +1,20 @@
 package com.arsinde.weatherapp.features.ble
 
 import android.Manifest
-import android.bluetooth.BluetoothAdapter
+import android.bluetooth.*
+import android.bluetooth.BluetoothGatt.*
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -17,11 +22,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.arsinde.weatherapp.BuildConfig
 import com.arsinde.weatherapp.R
 import com.arsinde.weatherapp.adapters.BluetoothDevicesAdapter
+import com.arsinde.weatherapp.dialogs.CurrentWeatherDialog
 import com.arsinde.weatherapp.features.components.BleDeviceInfoActivity
 import com.arsinde.weatherapp.features.components.DEVICE_ADDRESS
 import com.arsinde.weatherapp.features.components.DEVICE_NAME
 import com.arsinde.weatherapp.models.ble.BleViewModel
 import kotlinx.android.synthetic.main.ble_fragment.*
+import kotlinx.coroutines.delay
+import java.util.*
 
 
 const val REQUEST_LOCATION = 101
@@ -36,6 +44,12 @@ class BleFragment : Fragment() {
     private val viewModel: BleViewModel by viewModels()
     private val BluetoothAdapter.isDisabled: Boolean
         get() = !isEnabled
+
+    private val bluetoothManager by lazy {
+        context?.let {
+            it.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
